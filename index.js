@@ -16,6 +16,7 @@ async function run() {
         await client.connect();
         const bookCollection = client.db("bookHouse").collection("books")
 
+        // Get all data from Mongodb
         app.get('/inventory', async(req, res)=>{
             const query = {};
             const cursor = bookCollection.find(query);
