@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config()
 const app = express()
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -8,19 +9,33 @@ const port = process.env.PORT || 5000;
 app.use(cors())
 app.use(express.json())
 
-// user: BookHouse
-// Password: cLkRbyB1qzkFgK7c
-
-
-
-const uri = "mongodb+srv://<username>:<password>@cluster0.agg0z.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.agg0z.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-client.connect(err => {
-    const collection = client.db("test").collection("devices");
-    console.log('Mongo db connected');
-    // perform actions on the collection object
-    client.close();
-});
+async function run() {
+    try {
+        await client.connect();
+        const bookCollection = client.db("bookHouse").collection("books")
+
+        app.get('/inventory', async(req, res)=>{
+            const query = {};
+            const cursor = bookCollection.find(query);
+            const book = await cursor.toArray();
+            res.send(book)
+        })
+
+        app.post('/inventory', async(req, res)=>{
+            const newBook = req.body;
+            const result = await bookCollection.insertOne(newBook);
+            res.send(result)
+        })
+    
+    }
+    finally {
+        // await client.close();
+    }
+}
+
+run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
