@@ -40,7 +40,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Server for Assignment')
+    res.send('Server for Book House')
 })
 
 app.listen(port, () => {
